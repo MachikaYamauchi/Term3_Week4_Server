@@ -1,2 +1,77 @@
-GET http://localhost:4400/recommendApi
+@url = http://localhost:4400
 
+GET {{url}}/recommendApi
+
+###
+
+POST {{url}}/signup
+Content-Type: application/json
+
+{
+    "username":"Chika",
+    "email":"c@c.com",
+    "password":"1234"
+}
+
+###
+POST {{url}}/login
+Content-Type: application/json
+
+{
+    "username":"Chika",
+    "password":"1234"
+}
+
+###
+
+POST {{url}}/add
+Content-Type: application/json
+
+{
+    "image1":"assets/freshsand1.png",
+    "image2":"assets/freshsand2.png",
+    "image3":"assets/freshsand3.png",
+    "name":"Fresh Sand",
+    "rating":5,
+    "price":"$7.90",
+    "stock":"16",
+    "alt":"Fresh Sand Enjoy Summer",
+    "description":"Our Fresh Sand is with daily fresh vegetables!",
+    "display":1
+}
+
+###
+GET {{url}}/update/3
+
+###
+PUT {{url}}/updateProduct
+Content-Type: application/json
+
+{
+    "productID":"18",
+    "image1":"assets/freshsand1.png",
+    "image2":"assets/freshsand2.png",
+    "image3":"assets/freshsand3.png",
+    "name":"Fresh Sand",
+    "rating":5,
+    "price":"$7.90",
+    "stock":"16",
+    "alt":"VVVVVV",
+    "description":"SSSSSSSS",
+    "display":0
+}
+
+###
+GET {{url}}/showProduct
+
+###
+PUT {{url}}/toggleDisplay
+Content-Type: application/json
+
+{
+    "id":1
+}
+
+
+###
+DELETE  {{url}}/delete/19

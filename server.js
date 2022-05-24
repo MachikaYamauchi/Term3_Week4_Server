@@ -10,45 +10,6 @@ const db = mysql.createConnection({
     database:'Term3_week4Project'
 })
 
-// let breadJSON = [
-//     {
-//         carousel:"carouselExampleControlsNoTouching_1",
-//         image1:"assets/croissant1.png",
-//         image2:"assets/croissant2.png",
-//         image3:"assets/croissant3.png",
-//         name:"Apple Cinnamon Hot Cross Croissant",
-//         rating:4,
-//         price:"$ 7.99",
-//         stock:13,
-//         alt:"Apple Cinnamon Hot Cross Croissant of Bench Bakery",
-//         description:"Layers of buttery, flaky pastry wrapped around a rich, soft chocolate."
-//     },
-//     {
-//         carousel:"carouselExampleControlsNoTouching_2",
-//         image1:"assets/loaf1.png",
-//         image2:"assets/loaf2.png",
-//         image3:"assets/loaf3.png",
-//         name:"Sourdough Loaf",
-//         rating:3,
-//         price:"$ 8.99",
-//         stock:5,
-//         alt:"Sourdough Loaf of Bench Bakery",
-//         description:"The thick, crunchy crust and dense centre of our traditional Loaf. "
-//     },
-//     {
-//         carousel:"carouselExampleControlsNoTouching_3",
-//         image1:"assets/sandwich1.png",
-//         image2:"assets/sandwich2.png",
-//         image3:"assets/sandwich3.png",
-//         name:"Bench Bakery Special Sandwich",
-//         rating:4,
-//         price:"$ 6.99",
-//         stock:10,
-//         alt:"Bench Bakery Special Sandwich",
-//         description:"Our Fresh Sandwich is a fresh take on a favourite tradition!"
-//     }
-// ]
-
 const server = express();
 server.use(cors());
 
@@ -72,9 +33,149 @@ server.get('/recommendApi', (req, res) => {
     })
 })
 
-// server.get('/recommendApi', (req, res) => {
-//     res.json(breadJSON);
-// })
+server.post('/signup', (req, res)=> {
+    let username = req.body.username;
+    let email = req.body.email;
+    let password = req.body.password;
+    let query = "CALL `signup`(?, ?, ?)";
+    db.query(query, [username, email, password], (error, data)=> {
+        if(error){
+            res.json({signup:false, message:error});
+        }
+        else {
+            res.json({signup:true, message:"Signup Success"})
+        }
+    })
+})
+
+server.post('/login', (req, res) => {
+    let username = req.body.username;
+    let password = req.body.password;
+    let query = "CALL `login`(?, ?)";
+    db.query(query, [username, password], (error,data)=> {
+        if(error){
+            res.json({login:false, message:error})
+        }
+        else {
+            if(data[0].length ===0){
+                res.json({login:false, message:"Sorry, you have provided wrong credentials"})
+            }
+            else {
+                res.json({login:true, message:"login Success", data:data[0]})
+            }
+            
+        }
+    })
+})
+
+server.post('/add', (req, res) => {
+    let image1 = req.body.image1;
+    let image2 = req.body.image2;
+    let image3 = req.body.image3;
+    let name = req.body.name;
+    let rating = req.body.rating;
+    let price = req.body.price;
+    let stock = req.body.stock;
+    let alt = req.body.alt;
+    let description = req.body.description;
+    let display = req.body.display;
+    let query = "CALL `add`(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+    db.query(query, [image1, image2, image3, name, rating, price, stock, alt, description, display], (error, data) => {
+        if(error){
+            res.json({add:false, message:error})
+        }
+        else {
+            res.json({add:true, message:"Add Success"})
+        }
+    })
+})
+
+
+server.get('/update/:id', (req, res) => {
+    let productID = req.params.id;
+    let query = "CALL `One_Product`(?)";
+    db.query(query, [productID], (error, data) => {
+        if(error) {
+            res.json({getOneProduct:false, message:error})
+        }
+        else {
+            if(data[0].length === 0) {
+                res.json({getOneProduct:false, message:"Sorry, you cannot get product data"});
+            }
+            else {
+                res.json({getOneProduct:true, message:"Get one product Success!", data:data[0]});
+            }
+        }
+    })
+})
+
+
+server.put('/updateProduct', (req, res) => {
+    let productID = req.body.productID;
+    let image1 = req.body.image1;
+    let image2 = req.body.image2;
+    let image3 = req.body.image3;
+    let name = req.body.name;
+    let rating = req.body.rating;
+    let price = req.body.price;
+    let stock = req.body.stock;
+    let alt = req.body.alt;
+    let display = req.body.display;
+    let description = req.body.description;
+
+    let query = "CALL `updateProduct`(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    db.query(query, [productID, image1, image2, image3, name, rating, price, stock, alt, description, display], (error, data) => {
+        if(error){
+            res.json({update:false, message:error});
+        }
+        else {
+            res.json({update:true, message:"Update success"});
+        }
+    })
+})
+
+server.delete('/delete/:id', (req, res) => {
+    let productID = req.params.id;
+    let query = "CALL `deleteProduct`(?)";
+    db.query(query, [productID], (error, data)=> {
+        if(error) {
+            res.json({delete:false, message:error})
+        }
+        else {
+            res.json({delete:true, message:"Delete success"})
+        }
+    })
+})
+
+server.get('/showProduct', (req,res)=> {
+    let query = "CALL `showProduct`()";
+    db.query(query, (error, data) => {
+        if(error) {
+            res.json({showProduct:false, message:error})
+        }
+        else {
+            if(data[0] === 0){
+                res.json({showProduct:false, message:"Sorry you cannot get data."})
+            }
+            else {
+                res.json(data[0]);
+            }
+        }
+    })
+})
+
+server.put('/toggleDisplay', (req, res) => {
+    let productID = req.body.id;
+    let query = "CALL `toggle_display`(?);";
+    db.query(query, [productID], (error, data) => {
+        if(error) {
+            res.json({toggleDisplay:false, messsage:error});
+        }
+        else {
+            res.json({toggleDisplay:true, message:"toggle Display success"});
+        }
+    })
+})
 
 server.listen(4400, function() {
     console.log("The server is successfully running on port 4400")
